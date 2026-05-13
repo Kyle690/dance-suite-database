@@ -1,0 +1,14 @@
+model competition_notes {
+  uid             String      @id @unique @default(uuid()) @db.Uuid
+  created         DateTime    @default(now())
+  updated         DateTime    @updatedAt
+  competition_id  String      @db.Uuid
+  competition     competition @relation(fields: [competition_id], references: [uid])
+  user_id         String      @db.Uuid
+  user            users       @relation(fields: [user_id], references: [uid])
+  content         String // MD format
+  attachment_urls String[]
+
+  @@index([competition_id], name: "competition_notes_competition_id_idx")
+  @@index([user_id], name: "competition_notes_user_id_idx")
+}

@@ -1,0 +1,58 @@
+enum DancerAgeGroup {
+  TINY_TOTS
+  JUVENILE
+  JUNIOR
+  YOUTH
+  ADULT
+  SENIOR
+  AMATEUR
+  PROFFESSIONAL
+  MASTERS
+}
+
+enum DancerLevel {
+  PRE_BEGINNER
+  BEGINNER
+  BRONZE
+  SILVER
+  GOLD
+  NOVICE
+  PRE_CHAMP
+  RISING_STAR
+  CHAMPIONSHIP
+  PROFESSIONAL
+}
+
+enum DancerAssociatedUserAccess {
+  VIEW
+  EDIT
+}
+
+model dancer_profile {
+  uid                           String                      @id @unique @default(uuid()) @db.Uuid
+  created                       DateTime                    @default(now())
+  updated                       DateTime                    @updatedAt
+  full_name                     String
+  couple                        Boolean                     @default(false)
+  student                       Boolean                     @default(false) // if true, then the dancer / needs a parent gardian to register them
+  gardian_id                    String?                     @db.Uuid
+  gardian                       users?                      @relation("dancer_registration_gardian", fields: [gardian_id], references: [uid])
+  user_id                       String?                     @db.Uuid // if the dancer is registering themselves, then this will be populated with their user id
+  user                          users?                      @relation("dancer_registration_user", fields: [user_id], references: [uid])
+  associated_user_id            String?                     @db.Uuid // the user can give access to another user (e.g. parent, partner) to view / edit their registration
+  associated_user               users?                      @relation("dancer_registration_associated_user", fields: [associated_user_id], references: [uid])
+  associated_user_access        DancerAssociatedUserAccess? // the level of access the associated user has to the registration (e.g. view, edit)
+  partner_name                  String?
+  partner_date_of_birth         DateTime?
+  date_of_birth                 DateTime
+  age_group                     DancerAgeGroup
+  level                         DancerLevel
+  studio_name                   String?
+  region                        String?
+  country_code                  String?
+  registered_number             String? // the number issued to the dancer by the association they are registered with (e.g. WDSF, USA Dance, SADF, SADTA)
+  registered_number_association String? // the association that issued the registered number (e.g. WDSF, USA Dance, SADF, SADTA)
+
+  // relationships
+  competition_entries competition_entry[]
+}

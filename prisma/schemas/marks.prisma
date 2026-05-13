@@ -1,0 +1,16 @@
+model marks {
+  uid           String               @id @unique @default(uuid()) @db.Uuid
+  created       DateTime             @default(now())
+  updated       DateTime             @updatedAt
+  dancer_number Int
+  dancer_id     String?              @db.Uuid
+  dancer        competition_dancers? @relation(fields: [dancer_id], references: [uid], onDelete: Cascade)
+  heat_mark_id  String               @db.Uuid
+  heat_mark     heat_marks           @relation(fields: [heat_mark_id], references: [uid], onDelete: Cascade)
+  mark          Int?
+  percentage    Int?
+  dance         String
+
+  @@index([heat_mark_id], name: "marks_heat_mark_id_idx")
+  @@index([dancer_id], name: "marks_dancer_id_idx")
+}

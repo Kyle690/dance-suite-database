@@ -1,0 +1,37 @@
+enum CompetitionDancerCreatedByType {
+  SCRUTINEER
+  IMPORT
+  COMPETITION_ENTRY
+  OFFICIAL
+}
+
+model competition_dancers {
+  uid                  String                         @id @unique @default(uuid()) @db.Uuid
+  created              DateTime                       @default(now())
+  updated              DateTime                       @updatedAt
+  competition_entry_id String?                        @db.Uuid
+  competition_entry    competition_entry?             @relation(fields: [competition_entry_id], references: [uid])
+  number               String?
+  name                 String?
+  partner_name         String?
+  sutdio               String?
+  region               String?
+  country_code         String?
+  meta_data            Json?
+  created_type         CompetitionDancerCreatedByType @default(SCRUTINEER)
+  created_by_id        String?                        @db.Uuid
+  created_by           competition_users?             @relation("competition_dancers_created_by", fields: [created_by_id], references: [uid])
+  updated_by_id        String?                        @db.Uuid
+  updated_by           competition_users?             @relation("competition_dancers_updated_by", fields: [updated_by_id], references: [uid])
+  deleted_by_id        String?                        @db.Uuid
+  deleted_by           competition_users?             @relation("competition_dancers_deleted_by", fields: [deleted_by_id], references: [uid])
+
+  // relationships
+  section_dancers    section_dancers[]
+  competition_log    competition_log[]
+  heat_result_dancer heat_result_dancer[]
+  marks              marks[]
+  section_result     section_result[]
+
+  @@index([competition_entry_id], name: "competition_dancers_competition_entry_id_idx")
+}

@@ -1,0 +1,43 @@
+model competition_entry {
+  uid               String                 @id @unique @default(uuid()) @db.Uuid
+  created           DateTime               @default(now())
+  updated           DateTime               @updatedAt
+  competition_id    String                 @db.Uuid
+  competition       competition            @relation(fields: [competition_id], references: [uid])
+  // Either the dancer profile or the details can be stored directly in the entry, but not both. This allows for flexibility in handling both registered dancers and walk-ins.
+  dancer_profile_id String?                @db.Uuid
+  dancer_profile    dancer_profile?        @relation(fields: [dancer_profile_id], references: [uid])
+  name              String?
+  partner_name      String?
+  studio            String?
+  region            String?
+  country           String?
+  meta_data         Json?
+  is_deleted        Boolean                @default(false)
+  deleted_at        DateTime?
+  deleted_by_id     String?                @db.Uuid
+  deleted_by        users?                 @relation("dancer_entry_deleted_by", fields: [deleted_by_id], references: [uid])
+  deleted_reason    String?
+  invoice_id        String?
+  invoice_supplier  String? // e.g., "Stripe", "PayPal"
+  paid              Boolean                @default(false)
+  paid_at           DateTime?
+  payment_method    String?                @db.Uuid
+  refunded          Boolean                @default(false)
+  refunded_at       DateTime?
+  refund_reason     String?
+  refunded_by_id    String?                @db.Uuid
+  refunded_by       users?                 @relation("dancer_entry_refunded_by", fields: [refunded_by_id], references: [uid])
+  level             DancerLevel
+  age_group         DancerAgeGroup
+  entry_fee_id      String?                @db.Uuid
+  entry_fee         competition_entry_fee? @relation(fields: [entry_fee_id], references: [uid])
+
+  // relationships
+  entry_sections competition_entry_section[]
+  dancers        competition_dancers[]
+
+  @@index([competition_id], name: "competition_entry_competition_id_idx")
+  @@index([dancer_profile_id], name: "competition_entry_dancer_profile_id_idx")
+  @@index([entry_fee_id], name: "competition_entry_entry_fee_id_idx")
+}

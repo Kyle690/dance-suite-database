@@ -1,0 +1,11 @@
+model user_settings {
+  uid          String   @id @unique @default(uuid()) @db.Uuid
+  created      DateTime @default(now())
+  updated      DateTime @updatedAt
+  user_id      String   @db.Uuid
+  user         users    @relation(fields: [user_id], references: [uid])
+  currency     String   @default("GBP")
+  country_code String   @default("GB")
+
+  @@index([user_id], name: "user_settings_user_id_idx")
+}

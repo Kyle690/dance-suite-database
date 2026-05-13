@@ -1,0 +1,33 @@
+enum AddressType {
+  BILLING
+  SHIPPING
+  COMPETITION_LOCATION
+  STUDIO_LOCATION
+}
+
+model address {
+  uid            String       @id @unique @default(uuid()) @db.Uuid
+  created        DateTime     @default(now())
+  updated        DateTime     @updatedAt
+  name           String?
+  description    String?
+  line_1         String?
+  line_2         String?
+  city           String?
+  state          String?
+  postal_code    String?
+  country_code   String?
+  latitude       Float?
+  longitude      Float?
+  type           AddressType  @default(BILLING)
+  user_id        String?      @db.Uuid
+  user           users?       @relation(fields: [user_id], references: [uid])
+  competition_id String?      @db.Uuid
+  // Addresses that belong to a competition (e.g. organizer billing address)
+  competition    competition? @relation("competition_address", fields: [competition_id], references: [uid])
+  // Back-ref for competitions that use this address as their venue (competition.address_id)
+  competitions   competition[] @relation("competition_venue")
+
+  @@index([user_id], name: "address_user_id_idx")
+  @@index([competition_id], name: "address_competition_id_idx")
+}

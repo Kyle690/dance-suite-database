@@ -1,0 +1,100 @@
+name: Release
+
+on:
+  push:
+    branches: [develop, production]
+
+jobs:
+  release:
+    name: Build & release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # push tags, create GitHub releases
+      packages: write      # publish to GitHub Packages
+      pull-requests: write # open develop → production PR
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # semantic-release needs full history to compute the next version
+          fetch-depth: 0
+          # let semantic-release manage its own git credentials via GITHUB_TOKEN
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # ── Schema ────────────────────────────────────────────────────────────
+
+      - name: Validate schema
+        run: npx prisma validate
+
+      - name: Generate client
+        run: npx prisma generate
+
+      - name: Verify exports resolve
+        run: node -e "require('./index.js')"
+
+      # ── Release ───────────────────────────────────────────────────────────
+
+      - name: Authenticate npm with GitHub Packages
+        # @semantic-release/npm runs `npm publish` internally; this ensures the
+        # scoped registry (npm.pkg.github.com) is authenticated via NPM_TOKEN.
+        env:
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+
+      - name: Snapshot version before release
+        id: before
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Run semantic-release
+        # On `production`: creates a stable release (1.2.3, @latest on npm).
+        # On `develop`:    creates a pre-release (1.2.3-develop.1, @develop on npm).
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Detect whether a new version was published ────────────────────────
+
+      - name: Detect new release
+        id: detect
+        env:
+          OLD_VERSION: ${{ steps.before.outputs.version }}
+        run: |
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          if [ "$NEW_VERSION" != "$OLD_VERSION" ]; then
+            echo "released=true" >> $GITHUB_OUTPUT
+            echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "released=false" >> $GITHUB_OUTPUT
+            echo "No releasable commits — skipping PR creation."
+          fi
+
+      # ── Auto-open develop → production PR ─────────────────────────────────
+
+      - name: Open PR to production
+        # Only runs after a successful develop release. Skipped on production.
+        if: github.ref == 'refs/heads/develop' && steps.detect.outputs.released == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.detect.outputs.version }}
+        run: |
+          EXISTING=$(gh pr list --base production --head develop --state open --json number --jq '. | length')
+          if [ "$EXISTING" -eq "0" ]; then
+            gh pr create \
+              --base production \
+              --head develop \
+              --title "chore: promote develop to production ($VERSION)" \
+              --body "Automated PR to promote \`develop\` to \`production\` after pre-release \`$VERSION\` was published."
+          else
+            echo "PR from develop to production already open — skipping."
+          fi

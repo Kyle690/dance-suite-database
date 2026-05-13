@@ -1,0 +1,30 @@
+enum TicketType {
+  VIP
+  GENERAL_ADMISSION
+  EARLY_BIRD
+  TABLE_RESERVATION
+  FREE
+}
+
+model competition_tickets {
+  uid            String      @id @unique @default(uuid()) @db.Uuid
+  created        DateTime    @default(now())
+  updated        DateTime    @updatedAt
+  competition_id String      @db.Uuid
+  competition    competition @relation(fields: [competition_id], references: [uid])
+  name           String
+  description    String? // Optional description for the ticket type in MD format
+  price          Float
+  currency       String      @default("GBP")
+  type           TicketType  @default(GENERAL_ADMISSION)
+  quantity       Int
+  archived       Boolean     @default(false)
+  archived_at    DateTime?
+  archived_by_id String?     @db.Uuid
+  archived_by    users?      @relation("competition_tickets_archived_by", fields: [archived_by_id], references: [uid])
+
+  // relationships
+  competition_log competition_log[]
+
+  @@index([competition_id], name: "competition_tickets_competition_id_idx")
+}

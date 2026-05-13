@@ -1,0 +1,16 @@
+{
+  "branches": [
+    "production",
+    {
+      "name": "develop",
+      "prerelease": "develop",
+      "channel": "develop"
+    }
+  ],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/npm",
+    "@semantic-release/github"
+  ]
+}

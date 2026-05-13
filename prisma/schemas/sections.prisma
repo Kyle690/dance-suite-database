@@ -1,0 +1,55 @@
+enum SectionCategory {
+  BALLROOM
+  LATIN
+  TEN_DANCE
+  STANDARD
+  HIP_HOP
+  FREESTYLE
+  TRADITIONAL
+  SHOWDANCE
+  DISCO_DANCE
+}
+
+enum SectionEntryType {
+  SOLO
+  SOLO_NON_STATUS
+  DUO
+  COUPLE
+  GROUP
+  SINGLE
+  PRO_AM
+}
+
+enum CompetitiveType {
+  COMPETITIVE
+  SOCIAL
+  MIXED_COMPETITIVE
+}
+
+model sections {
+  uid              String           @id @unique @default(uuid()) @db.Uuid
+  created          DateTime         @default(now())
+  updated          DateTime         @updatedAt
+  competition_id   String           @db.Uuid
+  competition      competition      @relation(fields: [competition_id], references: [uid])
+  name             String?
+  age_group        DancerAgeGroup
+  level            DancerLevel
+  entry_type       SectionEntryType
+  category         SectionCategory
+  custom_name      Boolean          @default(false)
+  competitive_type CompetitiveType  @default(COMPETITIVE)
+  is_deleted       Boolean          @default(false)
+  deleted_at       DateTime?
+  deleted_by_id    String?          @db.Uuid
+  deleted_by       users?           @relation("section_deleted_by", fields: [deleted_by_id], references: [uid])
+
+  // relationships
+  heats           heat[]
+  heat_results    heat_result[]
+  section_results section_result[]
+  section_dancers section_dancers[]
+  competition_log competition_log[]
+
+  @@index([competition_id], name: "sections_competition_id_idx")
+}

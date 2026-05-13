@@ -1,0 +1,37 @@
+enum CompetitionEntryType {
+  COUPLE
+  SOLO
+  GROUP
+  PROFESSIONAL
+  ONE_DANCE // generally used for proffessional entries where the dancer is only competing in one dance (e.g. proffessional latin, proffessional standard)
+}
+
+model competition_entry_fee {
+  uid            String               @id @unique @default(uuid()) @db.Uuid
+  created        DateTime             @default(now())
+  updated        DateTime             @updatedAt
+  competition_id String               @db.Uuid
+  competition    competition          @relation(fields: [competition_id], references: [uid])
+  name           String
+  description    String?
+  inc_vat        Boolean              @default(false)
+  vat_rate       Float? // % calculated based on amount and inc_vat, stored for reporting and auditing purposes
+  currency       String
+  is_archived    Boolean              @default(false) // soft delete, allows us to keep historical data for reporting and auditing purposes
+  archived_at    DateTime?
+  archived_by_id String?              @db.Uuid
+  archived_by    users?               @relation("competition_entry_fee_archived_by", fields: [archived_by_id], references: [uid])
+  entry_type     CompetitionEntryType
+  price          Float? // all pricing is in pence/cents to avoid floating point issues, converted to dollars/pounds for display purposes
+  tiered_pricing Boolean              @default(false) // if true, then the entry fee is based on the number of entries (e.g. $10 for 1 entry, $18 for 2 entries, $25 for 3 or more entries)
+  tier_1_price   Float? // price for 1 entry
+  tier_2_price   Float? // price for 2 entries
+  tier_3_price   Float? // price for 3
+  tier_4_price   Float? // price for 4 or more entries
+  tier_5_price   Float? // price for 5 or more entries, used for proffessional entries where the dancer is competing in multiple dances (e.g. proffessional latin, proffessional standard)
+
+  // relationships
+  competition_entries competition_entry[]
+
+  @@index([competition_id], name: "competition_entry_fee_competition_id_idx")
+}

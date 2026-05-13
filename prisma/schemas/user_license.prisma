@@ -1,0 +1,19 @@
+enum LicenseType {
+  FREE
+  PRO
+  ENTERPRISE
+  LIFETIME
+}
+
+model user_license {
+  uid               String      @id @unique @default(uuid()) @db.Uuid
+  created           DateTime    @default(now())
+  updated           DateTime    @updatedAt
+  user_id           String      @db.Uuid
+  user              users       @relation(fields: [user_id], references: [uid])
+  license_type      LicenseType @default(FREE)
+  expiration_date   DateTime?
+  stripe_invoice_id String?
+
+  @@index([user_id], name: "user_license_user_id_idx")
+}

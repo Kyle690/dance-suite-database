@@ -1,0 +1,36 @@
+model panels {
+  uid                 String                @id @unique @default(uuid()) @db.Uuid
+  created             DateTime              @default(now())
+  updated             DateTime              @updatedAt
+  competition_id      String                @db.Uuid
+  competition         competition           @relation(fields: [competition_id], references: [uid])
+  name                String?               @db.Text
+  is_deleted          Boolean               @default(false)
+  deleted_at          DateTime?
+  deleted_by_id       String?               @db.Uuid
+  deleted_by          users?                @relation("panels_deleted_by", fields: [deleted_by_id], references: [uid])
+
+  // relationships
+  competition_log     competition_log[]
+  heat                heat[]
+  panels_adjudicators panels_adjudicators[]
+
+  @@index([competition_id], name: "panels_competition_id_idx")
+}
+
+model panels_adjudicators {
+  uid            String      @id @unique @default(uuid()) @db.Uuid
+  created        DateTime    @default(now())
+  updated        DateTime    @updatedAt
+  panel_id       String      @db.Uuid
+  panel          panels      @relation(fields: [panel_id], references: [uid])
+  adjudicator_id String      @db.Uuid
+  adjudicator    adjudicator @relation(fields: [adjudicator_id], references: [uid])
+  is_deleted     Boolean     @default(false)
+  deleted_at     DateTime?
+  deleted_by_id  String?     @db.Uuid
+  deleted_by     users?      @relation("panels_adjudicators_deleted_by", fields: [deleted_by_id], references: [uid])
+
+  @@index([panel_id], name: "panels_adjudicators_panel_id_idx")
+  @@index([adjudicator_id], name: "panels_adjudicators_adjudicator_id_idx")
+}

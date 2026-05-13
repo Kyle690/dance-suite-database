@@ -1,0 +1,43 @@
+enum CompetitionStatus {
+  DRAFT // not live to anyone but the creator and admins
+  LIVE // live to everyone, program and results are available, but the competition is not yet completed
+  COMPLETED // complete, cannot be edited, program and results are available
+  CANCELLED // cancelled, cannot be edited, program and results are not available, published to the public as cancelled
+  ARCHIVED // archived, cannot be edited, program and results are not available, not published to the public at all
+}
+
+model competition {
+  uid                      String            @id @unique @default(uuid()) @db.Uuid
+  created                  DateTime          @default(now())
+  updated                  DateTime          @updatedAt
+  name                     String
+  description              String?
+  date                     DateTime?
+  start_time               DateTime?
+  end_time                 DateTime?
+  entry_closing_date       DateTime?
+  status                   CompetitionStatus @default(DRAFT)
+  terms_and_conditions     String? // MD format for rules and guidelines for the competition
+  additional_info          String? // MD format for any additional info about the competition
+  address_id               String?           @db.Uuid
+  address                  address?          @relation("competition_venue", fields: [address_id], references: [uid])
+  banner_url               String?
+  carousel_images          String[]          @default([])
+  contact_name             String?
+  contact_email            String?
+  contact_phone            String?
+  associated_organizations String[]          @default([]) // list of associated organizations or sponsors for the competition
+
+  // relationships
+  addresses           address[]                    @relation("competition_address")
+  competition_log     competition_log[]
+  payment_methods     competition_payment_method[]
+  sections            sections[]
+  adjudicators        adjudicator[]
+  panels              panels[]
+  competition_users   competition_users[]
+  entry_fees          competition_entry_fee[]
+  notes               competition_notes[]
+  tickets             competition_tickets[]
+  competition_entries competition_entry[]
+}

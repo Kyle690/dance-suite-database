@@ -1,0 +1,112 @@
+enum CompetitionLogType {
+  CREATED
+  UPDATED
+  CANCELED
+  COMPLETED
+  ARCHIVED
+
+  COMPETITION_ENTRY_FEE_CREATED
+  COMPETITION_ENTRY_FEE_UPDATED
+  COMPETITION_ENTRY_FEE_DELETED
+
+  // Dancer Actions
+  COMPETITION_ENTRY_CREATED
+  COMPETITION_ENTRY_UPDATED
+  COMPETITION_ENTRY_DELETED
+  COMPETITION_ENTRY_PAID
+  COMPETITION_ENTRY_REFUNDED
+  COMPETITION_ENTRY_FAILED
+
+  COMPETITION_DANCER_CREATED
+  COMPETITION_DANCER_UPDATED
+  COMPETITION_DANCER_DELETED
+
+  // Sections
+  SECTION_CREATED
+  SECTION_UPDATED
+  SECTION_DELETED
+  SECTION_COMPLETED
+
+  SECTION_DANCER_ADDED
+  SECTION_DANCER_REMOVED
+  SECTION_DANCER_EDITED
+
+  HEAT_CREATED
+  HEAT_UPDATED
+  HEAT_DELETED
+  HEAT_MARKS_ENTERED
+  HEAT_MARKS_SUBMITTED
+  HEAT_MARKS_APPROVED
+  HEAT_MARKS_CHECKED
+  HEAT_STATUS_UPDATED
+
+  COMPETITION_USER_CREATED
+  COMPETITION_USER_EDITED
+  COMPETITION_USER_DELETED
+
+  ADJUDICATOR_CREATED
+  ADJUDICATOR_EDITED
+  ADJUDICATOR_DELETED
+  ADJUDICATOR_SIGNED_IN
+  ADJUDICATOR_SIGNED_OUT
+  ADJUDICATOR_SUBMITTED_MARKS
+
+  PANEL_CREATED
+  PANEL_EDITED
+  PANEL_DELETED
+
+  COMPETITION_NOTE_ADDED
+  COMPETITION_NOTE_EDITED
+  COMPETITION_NOTE_DELETED
+
+  SYSTEM_EVENT
+
+  // Dancer Actions
+  DANCER_REGISTERED // Dancer registered for the competition, either by themselves or by an organizer
+  DANCER_ENTRY_PAID // Dancer entry fee paid, either by themselves or by an organizer on their behalf
+  DANCER_ENTRY_REFUNDED // Dancer entry fee refunded, either by themselves or by an organizer on their behalf
+  DANCER_ENTRY_FAILED // Dancer entry fee failed, either by themselves or by an organizer on their behalf
+  DANCER_ADDED // Dancer added to the section by an organizer or scrutineer
+  DANCER_EDITED // Dancer information edited by an organizer or scrutineer
+  DANCER_WITHDRAWN // Dancer withdrawn from the section by an organizer or scrutineer
+
+  TICKET_PURCHASED // Ticket purchased for the competition, either by a dancer or by an organizer on behalf of a dancer or by a spectator
+  TICKET_REFUNDED // Ticket refunded for the competition, either by a dancer or by an organizer on behalf of a dancer or by a spectator
+  TICKET_CANCELED // Ticket canceled for the competition, either by a dancer or by an organizer on behalf of a dancer or by a spectator
+  TICKET_CHECKED_IN // Ticket checked in for the competition, either by a dancer or by an organizer on behalf of a dancer or by a spectator
+}
+
+model competition_log {
+  uid                  String              @id @unique @default(uuid()) @db.Uuid
+  created              DateTime            @default(now())
+  updated              DateTime            @updatedAt
+  competition_id       String              @db.Uuid
+  competition          competition         @relation(fields: [competition_id], references: [uid])
+  user_id              String              @db.Uuid
+  user                 users               @relation(fields: [user_id], references: [uid])
+  type                 CompetitionLogType  @default(CREATED)
+  message              String?
+  file_url             String?
+  metadata             Json?
+  adjudicator_id       String?             @db.Uuid
+  adjudicator          adjudicator?        @relation(fields: [adjudicator_id], references: [uid])
+  ticket_id            String?             @db.Uuid
+  ticket               competition_tickets? @relation(fields: [ticket_id], references: [uid])
+  section_id           String?             @db.Uuid
+  section              sections?           @relation(fields: [section_id], references: [uid])
+  heat_id              String?             @db.Uuid
+  heat                 heat?               @relation(fields: [heat_id], references: [uid])
+  panel_id             String?             @db.Uuid
+  panel                panels?             @relation(fields: [panel_id], references: [uid])
+  competition_user_id  String?             @db.Uuid
+  competition_user     competition_users?  @relation(fields: [competition_user_id], references: [uid])
+  competition_dancer_id String?            @db.Uuid
+  competition_dancer   competition_dancers? @relation(fields: [competition_dancer_id], references: [uid])
+
+  @@index([user_id], name: "competition_log_user_id_idx")
+  @@index([competition_id], name: "competition_log_competition_id_idx")
+  @@index([section_id], name: "competition_log_section_id_idx")
+  @@index([heat_id], name: "competition_log_heat_id_idx")
+  @@index([panel_id], name: "competition_log_panel_id_idx")
+  @@index([adjudicator_id], name: "competition_log_adjudicator_id_idx")
+}

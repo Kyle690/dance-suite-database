@@ -1,0 +1,35 @@
+enum CompetitionUserRole {
+  ORGANIZER
+  SCRUTINEER
+  JUDGE
+  OFFICIAL
+  VIEWER
+  TEAM_MEMBER
+}
+
+model competition_users {
+  uid            String              @id @unique @default(uuid()) @db.Uuid
+  created        DateTime            @default(now())
+  updated        DateTime            @updatedAt
+  competition_id String              @db.Uuid
+  competition    competition         @relation(fields: [competition_id], references: [uid])
+  user_id        String              @db.Uuid
+  user           users               @relation(fields: [user_id], references: [uid])
+  role           CompetitionUserRole @default(VIEWER)
+  is_deleted     Boolean             @default(false)
+  deleted_at     DateTime?
+  is_active      Boolean             @default(true)
+
+  // relationships
+  heat_reviewed_by          heat[]               @relation("competition_user_heat_reviewed_by")
+  heat_checked_by           heat[]               @relation("competition_user_heat_checked_by")
+  competition_dancers_created competition_dancers[] @relation("competition_dancers_created_by")
+  competition_dancers_updated competition_dancers[] @relation("competition_dancers_updated_by")
+  competition_dancers_deleted competition_dancers[] @relation("competition_dancers_deleted_by")
+  competition_log             competition_log[]
+  heat_marks                  heat_marks[]
+  heat_result                 heat_result[]
+
+  @@index([competition_id], name: "competition_users_competition_id_idx")
+  @@index([user_id], name: "competition_users_user_id_idx")
+}

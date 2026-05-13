@@ -1,0 +1,52 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    name: Generate & publish to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          # Scopes all @dance-suite/* packages to GitHub Packages.
+          # Change the scope to match your GitHub org name.
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@dance-suite'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Validate schema
+        run: npx prisma validate
+
+      - name: Generate client
+        run: npx prisma generate
+
+      - name: Verify exports resolve
+        run: node -e "require('./index.js')"
+
+      - name: Set version from release tag
+        # Strips a leading "v" (e.g. v1.2.3 → 1.2.3) so npm version is happy.
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+          npm version "$VERSION" --no-git-tag-version
+
+      - name: Publish
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

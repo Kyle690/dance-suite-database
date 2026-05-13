@@ -1,0 +1,37 @@
+{
+  "name": "@dance-suite/database",
+  "version": "1.0.0",
+  "description": "DanceSuite Prisma database client and schema",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "generated/",
+    "prisma/",
+    "index.js",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "validate": "prisma validate"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "prisma": "^7.8.0"
+  },
+  "devDependencies": {
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/github": "^10.0.0",
+    "@semantic-release/npm": "^12.0.0",
+    "@semantic-release/release-notes-generator": "^14.0.0",
+    "semantic-release": "^24.2.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  }
+}

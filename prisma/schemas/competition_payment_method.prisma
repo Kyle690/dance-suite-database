@@ -1,0 +1,29 @@
+enum CompetitionPaymentMethodType {
+  STRIPE
+  PAYPAL
+  BANK_TRANSFER
+}
+
+model competition_payment_method {
+  uid               String                       @id @unique @default(uuid()) @db.Uuid
+  created           DateTime                     @default(now())
+  updated           DateTime                     @updatedAt
+  competition_id    String                       @db.Uuid
+  competition       competition                  @relation(fields: [competition_id], references: [uid])
+  name              String
+  created_by_id     String?                      @db.Uuid
+  created_by        users?                       @relation("competition_payment_methods_created_by", fields: [created_by_id], references: [uid])
+  type              CompetitionPaymentMethodType @default(BANK_TRANSFER)
+  account_name      String?
+  bank_name         String?
+  account_number    String?
+  branch_code       String? // sort-code for uk banks, routing number for us banks
+  paypal_email      String?
+  stripe_account_id String?
+  is_deleted        Boolean                      @default(false)
+  deleted_at        DateTime?
+  deleted_by_id     String?                      @db.Uuid
+  deleted_by        users?                       @relation("competition_payment_methods_deleted_by", fields: [deleted_by_id], references: [uid])
+
+  @@index([competition_id], name: "competition_payment_method_competition_id_idx")
+}

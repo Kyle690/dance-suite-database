@@ -1,0 +1,12 @@
+model competition_entry_section {
+  uid                  String            @id @unique @default(uuid()) @db.Uuid
+  created              DateTime          @default(now())
+  updated              DateTime          @updatedAt
+  competition_entry_id String            @db.Uuid
+  competition_entry    competition_entry @relation(fields: [competition_entry_id], references: [uid], onDelete: Cascade)
+  category             SectionCategory
+  entry_type           SectionEntryType
+  competitive_type     CompetitiveType
+
+  @@index([competition_entry_id], name: "competition_entry_section_competition_entry_id_idx")
+}

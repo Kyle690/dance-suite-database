@@ -1,0 +1,48 @@
+enum HeatType {
+  ROUND
+  QUARTER_FINAL
+  SEMI_FINAL
+  FINAL
+  UNCONTESTED
+}
+
+enum HeatStatus {
+  DRAFT // not yet started
+  ACTIVE // heat ready for marshalling
+  MARSHALLING // marshalling in progress, collecting all dancers
+  READY // marshalling complete, heat ready to start
+  JUDGING // heat in progress
+  REVIEWING // heat complete, results being reviewed by scrutineer
+  CHECKING // results reviewed by chairperson, ready for final check
+  COMPLETE // heat complete, results final
+  CANCELED // heat canceled
+}
+
+model heat {
+  uid             String                @id @unique @default(uuid()) @db.Uuid
+  created         DateTime              @default(now())
+  updated         DateTime              @updatedAt
+  section_id      String                @db.Uuid
+  section         sections              @relation(fields: [section_id], references: [uid], onDelete: Cascade)
+  order           Int?
+  item_no         String
+  status          HeatStatus            @default(DRAFT)
+  type            HeatType              @default(ROUND)
+  callback_limit  Int?
+  dances          String[]
+  start_list      heat_dancers[]
+  panel_id        String?               @db.Uuid
+  panel           panels?               @relation(fields: [panel_id], references: [uid])
+  reviewed_by_id  String?               @db.Uuid
+  reviewed_by     competition_users?    @relation("competition_user_heat_reviewed_by", fields: [reviewed_by_id], references: [uid])
+  reviewed_at     DateTime?
+  checked_by_id   String?               @db.Uuid
+  checked_by      competition_users?    @relation("competition_user_heat_checked_by", fields: [checked_by_id], references: [uid])
+  checked_at      DateTime?
+  competition_log competition_log[]
+  heat_marks      heat_marks[]
+  heat_result     heat_result[]
+
+  @@index([section_id], name: "heat_section_id_idx")
+  @@index([panel_id], name: "heat_panel_id_idx")
+}
