@@ -1,10 +1,11 @@
 enum CompetitionUserRole {
-  ORGANIZER
-  SCRUTINEER
-  JUDGE
-  OFFICIAL
-  VIEWER
-  TEAM_MEMBER
+  ORGANIZER // the main organizer of the competition, has all permissions, can manage all aspects of the competition, including adding other users, creating sections, managing entries,
+  SCRUTINEER // can manage sections, dancers, and heats, but cannot manage users or edit competition details
+  JUDGE // can view all sections related to them and can add marks
+  OFFICIAL // can view all sections related to them, confirm dancers for section
+  VIEWER // can view the competition details and sections, but cannot manage anything
+  TEAM_MEMBER //
+  ADMIN // has all permissions across all competitions, including managing users and competition details, but cannot be assigned to a specific competition as an organizer or scrutineer
 }
 
 model competition_users {
@@ -21,8 +22,8 @@ model competition_users {
   is_active      Boolean             @default(true)
 
   // relationships
-  heat_reviewed_by          heat[]               @relation("competition_user_heat_reviewed_by")
-  heat_checked_by           heat[]               @relation("competition_user_heat_checked_by")
+  heat_reviewed_by            heat[]                @relation("competition_user_heat_reviewed_by")
+  heat_checked_by             heat[]                @relation("competition_user_heat_checked_by")
   competition_dancers_created competition_dancers[] @relation("competition_dancers_created_by")
   competition_dancers_updated competition_dancers[] @relation("competition_dancers_updated_by")
   competition_dancers_deleted competition_dancers[] @relation("competition_dancers_deleted_by")

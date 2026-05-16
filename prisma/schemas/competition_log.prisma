@@ -77,31 +77,33 @@ enum CompetitionLogType {
 }
 
 model competition_log {
-  uid                  String              @id @unique @default(uuid()) @db.Uuid
-  created              DateTime            @default(now())
-  updated              DateTime            @updatedAt
-  competition_id       String              @db.Uuid
-  competition          competition         @relation(fields: [competition_id], references: [uid])
-  user_id              String              @db.Uuid
-  user                 users               @relation(fields: [user_id], references: [uid])
-  type                 CompetitionLogType  @default(CREATED)
-  message              String?
-  file_url             String?
-  metadata             Json?
-  adjudicator_id       String?             @db.Uuid
-  adjudicator          adjudicator?        @relation(fields: [adjudicator_id], references: [uid])
-  ticket_id            String?             @db.Uuid
-  ticket               competition_tickets? @relation(fields: [ticket_id], references: [uid])
-  section_id           String?             @db.Uuid
-  section              sections?           @relation(fields: [section_id], references: [uid])
-  heat_id              String?             @db.Uuid
-  heat                 heat?               @relation(fields: [heat_id], references: [uid])
-  panel_id             String?             @db.Uuid
-  panel                panels?             @relation(fields: [panel_id], references: [uid])
-  competition_user_id  String?             @db.Uuid
-  competition_user     competition_users?  @relation(fields: [competition_user_id], references: [uid])
-  competition_dancer_id String?            @db.Uuid
-  competition_dancer   competition_dancers? @relation(fields: [competition_dancer_id], references: [uid])
+  uid                   String               @id @unique @default(uuid()) @db.Uuid
+  created               DateTime             @default(now())
+  updated               DateTime             @updatedAt
+  competition_id        String               @db.Uuid
+  competition           competition          @relation(fields: [competition_id], references: [uid])
+  user_id               String?              @db.Uuid
+  user                  users?               @relation(fields: [user_id], references: [uid])
+  type                  CompetitionLogType   @default(CREATED)
+  message               String?
+  file_url              String?
+  metadata              Json?
+  adjudicator_id        String?              @db.Uuid
+  adjudicator           adjudicator?         @relation(fields: [adjudicator_id], references: [uid])
+  ticket_id             String?              @db.Uuid
+  ticket                competition_tickets? @relation(fields: [ticket_id], references: [uid])
+  section_id            String?              @db.Uuid
+  section               sections?            @relation(fields: [section_id], references: [uid])
+  heat_id               String?              @db.Uuid
+  heat                  heat?                @relation(fields: [heat_id], references: [uid])
+  panel_id              String?              @db.Uuid
+  panel                 panels?              @relation(fields: [panel_id], references: [uid])
+  competition_user_id   String?              @db.Uuid
+  competition_user      competition_users?   @relation(fields: [competition_user_id], references: [uid])
+  competition_dancer_id String?              @db.Uuid
+  competition_dancer    competition_dancers? @relation(fields: [competition_dancer_id], references: [uid])
+  competition_note_id   String?              @db.Uuid
+  competition_note      competition_notes?   @relation(fields: [competition_note_id], references: [uid])
 
   @@index([user_id], name: "competition_log_user_id_idx")
   @@index([competition_id], name: "competition_log_competition_id_idx")
@@ -109,4 +111,7 @@ model competition_log {
   @@index([heat_id], name: "competition_log_heat_id_idx")
   @@index([panel_id], name: "competition_log_panel_id_idx")
   @@index([adjudicator_id], name: "competition_log_adjudicator_id_idx")
+  @@index([ticket_id], name: "competition_log_ticket_id_idx")
+  @@index([competition_user_id], name: "competition_log_competition_user_id_idx")
+  @@index([competition_note_id], name: "competition_log_competition_note_id_idx")
 }

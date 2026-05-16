@@ -1,7 +1,7 @@
 model adjudicator {
-  uid                  String                @id @unique @default(uuid()) @db.Uuid
-  created              DateTime              @default(now())
-  updated              DateTime              @updatedAt
+  uid                  String      @id @unique @default(uuid()) @db.Uuid
+  created              DateTime    @default(now())
+  updated              DateTime    @updatedAt
   name                 String
   letter               String
   login_code           String?
@@ -12,17 +12,17 @@ model adjudicator {
   phone_number         String?
   country_code         String?
   country_calling_code String?
-  competition_id       String                @db.Uuid
-  competition          competition           @relation(fields: [competition_id], references: [uid])
-  is_deleted           Boolean               @default(false)
+  competition_id       String      @db.Uuid
+  competition          competition @relation(fields: [competition_id], references: [uid])
+  is_deleted           Boolean     @default(false)
   deleted_at           DateTime?
-  deleted_by_id        String?               @db.Uuid
-  deleted_by           users?                @relation("adjudicator_deleted_by", fields: [deleted_by_id], references: [uid])
+  deleted_by_id        String?     @db.Uuid
+  deleted_by           users?      @relation("adjudicator_deleted_by", fields: [deleted_by_id], references: [uid])
 
   // relationships
-  heat_marks           heat_marks[]
-  panels_adjudicators  panels_adjudicators[]
-  competition_log      competition_log[]
+  heat_marks          heat_marks[]
+  panels_adjudicators panels_adjudicators[]
+  competition_log     competition_log[]
 
   @@index([competition_id], name: "adjudicator_competition_id_idx")
 }
