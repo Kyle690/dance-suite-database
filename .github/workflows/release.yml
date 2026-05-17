@@ -56,8 +56,8 @@ jobs:
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
       - name: Run semantic-release
-        # On `production`: creates a stable release (1.2.3, @latest on npm).
-        # On `develop`:    creates a pre-release (1.2.3-develop.1, @develop on npm).
+        # On `main`:    creates a stable release (1.2.3, @latest on npm).
+        # On `develop`: creates a pre-release (1.2.3-develop.1, @develop on npm).
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -81,20 +81,20 @@ jobs:
 
       # ── Auto-open develop → production PR ─────────────────────────────────
 
-      - name: Open PR to production
-        # Only runs after a successful develop release. Skipped on production.
+      - name: Open PR to main
+        # Only runs after a successful develop release. Skipped on main.
         if: github.ref == 'refs/heads/develop' && steps.detect.outputs.released == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.detect.outputs.version }}
         run: |
-          EXISTING=$(gh pr list --base production --head develop --state open --json number --jq '. | length')
+          EXISTING=$(gh pr list --base main --head develop --state open --json number --jq '. | length')
           if [ "$EXISTING" -eq "0" ]; then
             gh pr create \
-              --base production \
+              --base main \
               --head develop \
-              --title "chore: promote develop to production ($VERSION)" \
-              --body "Automated PR to promote \`develop\` to \`production\` after pre-release \`$VERSION\` was published."
+              --title "chore: promote develop to main ($VERSION)" \
+              --body "Automated PR to promote \`develop\` to \`main\` after pre-release \`$VERSION\` was published."
           else
-            echo "PR from develop to production already open — skipping."
+            echo "PR from develop to main already open — skipping."
           fi
