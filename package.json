@@ -1,5 +1,5 @@
 {
-  "name": "@dance-suite/database",
+  "name": "@kyle690/database",
   "version": "1.0.0",
   "description": "DanceSuite Prisma database client and schema",
   "main": "index.js",
