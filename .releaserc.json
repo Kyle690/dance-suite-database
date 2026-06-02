@@ -1,6 +1,6 @@
 {
   "branches": [
-    "production",
+    "main",
     {
       "name": "develop",
       "prerelease": "develop",

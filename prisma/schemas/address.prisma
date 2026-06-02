@@ -6,9 +6,9 @@ enum AddressType {
 }
 
 model address {
-  uid            String       @id @unique @default(uuid()) @db.Uuid
-  created        DateTime     @default(now())
-  updated        DateTime     @updatedAt
+  uid            String        @id @unique @default(uuid()) @db.Uuid
+  created        DateTime      @default(now())
+  updated        DateTime      @updatedAt
   name           String?
   description    String?
   line_1         String?
@@ -19,12 +19,12 @@ model address {
   country_code   String?
   latitude       Float?
   longitude      Float?
-  type           AddressType  @default(BILLING)
-  user_id        String?      @db.Uuid
-  user           users?       @relation(fields: [user_id], references: [uid])
-  competition_id String?      @db.Uuid
+  type           AddressType   @default(BILLING)
+  user_id        String?       @db.Uuid
+  user           users?        @relation(fields: [user_id], references: [uid])
+  competition_id String?       @db.Uuid
   // Addresses that belong to a competition (e.g. organizer billing address)
-  competition    competition? @relation("competition_address", fields: [competition_id], references: [uid])
+  competition    competition?  @relation("competition_address", fields: [competition_id], references: [uid])
   // Back-ref for competitions that use this address as their venue (competition.address_id)
   competitions   competition[] @relation("competition_venue")
 

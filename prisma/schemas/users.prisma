@@ -6,40 +6,40 @@ enum UserRegistrationType {
 }
 
 model users {
-  uid                  String            @id @unique @default(uuid()) @db.Uuid
-  created              DateTime          @default(now())
-  updated              DateTime          @updatedAt
-  external_id          String?           @unique
-  stripe_customer_id   String?           @unique
-  completed_onboarding Boolean           @default(false)
-  approved             Boolean           @default(false)
+  uid                  String    @id @unique @default(uuid()) @db.Uuid
+  created              DateTime  @default(now())
+  updated              DateTime  @updatedAt
+  external_id          String?   @unique
+  stripe_customer_id   String?   @unique
+  completed_onboarding Boolean   @default(false)
+  approved             Boolean   @default(false)
   approved_at          DateTime?
   approved_reason      String?
-  is_deleted           Boolean           @default(false)
+  is_deleted           Boolean   @default(false)
   deleted_at           DateTime?
   deleted_reason       String?
   metadata             Json?
 
   // relationships
-  addresses                    address[]
-  user_settings                user_settings[]
-  user_licenses                user_license[]
-  competition_users            competition_users[]
-  competition_log              competition_log[]
-  competition_notes            competition_notes[]
-  dancer_profiles_guardian     dancer_profile[]             @relation("dancer_registration_gardian")
-  dancer_profiles              dancer_profile[]             @relation("dancer_registration_user")
-  dancer_profiles_associated   dancer_profile[]             @relation("dancer_registration_associated_user")
-  entries_deleted              competition_entry[]          @relation("dancer_entry_deleted_by")
-  entries_refunded             competition_entry[]          @relation("dancer_entry_refunded_by")
-  entry_fees_archived          competition_entry_fee[]      @relation("competition_entry_fee_archived_by")
-  tickets_archived             competition_tickets[]        @relation("competition_tickets_archived_by")
-  payment_methods_created      competition_payment_method[] @relation("competition_payment_methods_created_by")
-  payment_methods_deleted      competition_payment_method[] @relation("competition_payment_methods_deleted_by")
-  sections_deleted             sections[]                   @relation("section_deleted_by")
-  adjudicators_deleted         adjudicator[]                @relation("adjudicator_deleted_by")
-  panels_deleted               panels[]                     @relation("panels_deleted_by")
-  panels_adjudicators_deleted  panels_adjudicators[]        @relation("panels_adjudicators_deleted_by")
+  addresses                   address[]
+  user_settings               user_settings[]
+  user_licenses               user_license[]
+  competition_users           competition_users[]
+  competition_log             competition_log[]
+  competition_notes           competition_notes[]
+  dancer_profiles_guardian    dancer_profile[]             @relation("dancer_registration_gardian")
+  dancer_profiles             dancer_profile[]             @relation("dancer_registration_user")
+  dancer_profiles_associated  dancer_profile[]             @relation("dancer_registration_associated_user")
+  entries_deleted             competition_entry[]          @relation("dancer_entry_deleted_by")
+  entries_refunded            competition_entry[]          @relation("dancer_entry_refunded_by")
+  entry_fees_archived         competition_entry_fee[]      @relation("competition_entry_fee_archived_by")
+  tickets_archived            competition_tickets[]        @relation("competition_tickets_archived_by")
+  payment_methods_created     competition_payment_method[] @relation("competition_payment_methods_created_by")
+  payment_methods_deleted     competition_payment_method[] @relation("competition_payment_methods_deleted_by")
+  sections_deleted            sections[]                   @relation("section_deleted_by")
+  adjudicators_deleted        adjudicator[]                @relation("adjudicator_deleted_by")
+  panels_deleted              panels[]                     @relation("panels_deleted_by")
+  panels_adjudicators_deleted panels_adjudicators[]        @relation("panels_adjudicators_deleted_by")
 
   @@index([external_id], name: "users_external_id_idx")
   @@index([stripe_customer_id], name: "users_stripe_customer_id_idx")
